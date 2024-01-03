@@ -1,0 +1,58 @@
+---
+- name: Initiate new server
+  hosts: proxy
+  vars_files:
+    - vars/setup
+  tasks:
+    - name: Ensure epel-repository installed
+      yum:
+        name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+        state: present
+      tags: epelinstall
+
+    - name: Ensure Yum manager installed
+      yum:
+        name: yum-utils
+        state: present
+      tags: yumutils
+
+    - name: Ensure PIP installed
+      yum:
+        name: python-pip
+        state: latest
+      tags: pipinstall
+
+    - name: Ensure pexpect installed
+      shell: pip install pexpect
+      args:
+        executable: /bin/bash
+      tags: pexpectinstall
+
+    - name: Setup hostname
+      hostname:
+        name: '{{ansible_hostname}}.estrada.co.id'
+#      loop: "{{ ansible_hostname }}"
+      tags: sethostname
+
+    - name: Ensure IPA Client are installed
+      yum:
+        name: freeipa-client
+        state: present
+      tags: installipa
+
+    - name: Join IPA Client to server
+      expect: 
+        command: ipa-client-install --mkhomedir --force-ntpd
+        timeout: 300
+        responses: 
+          (.*)Provide the domain name of your IPA server(.*): "centraluser.estrada.co.id"
+          (.*)Provide your IPA server name(.*): "centraluser.estrada.co.id"
+          (.*)Proceed with fixed values and no DNS discovery(.*): "yes"
+          (.*)Continue to configure the system with these values(.*): "yes"
+          (.*)User authorized to enroll computers(.*): "regis"
+          (.*)Password for admin@IPA.ESTRADA.CO.ID(.*): "Regis312"
+      register: ipaclientdebug
+      tags: joinserver
+
+    - debug: var=ipaclientdebut.stdout_lines
+      tags: debug
