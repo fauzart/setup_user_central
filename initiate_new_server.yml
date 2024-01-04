@@ -50,7 +50,7 @@
           (.*)Proceed with fixed values and no DNS discovery(.*): "yes"
           (.*)Continue to configure the system with these values(.*): "yes"
           (.*)User authorized to enroll computers(.*): "regis"
-          (.*)Password for admin@IPA.ESTRADA.CO.ID(.*): "Regis312"
+          (.*)Password for admin@CENTRAL.ESTRADA.CO.ID(.*): "Regis320"
       register: ipaclientdebug
       tags: joinserver
 
